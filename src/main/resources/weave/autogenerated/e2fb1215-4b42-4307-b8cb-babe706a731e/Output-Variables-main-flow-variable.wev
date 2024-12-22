@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_e2fb1215_4b42_4307_b8cb_babe706a731e_Output_Variables_main_flow_variable = Any
+

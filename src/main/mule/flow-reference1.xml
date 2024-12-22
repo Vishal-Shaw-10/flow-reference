@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7148ea01-aee3-4311-9431-25550a1712b0" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="8fa591b1-b748-4423-881c-ef5b1b1b8d02" />
+	<flow name="flow-referrence1-without-target-payload" doc:id="616fa81d-b129-4b99-a049-60b9fb819a02" >
+		<http:listener doc:name="Listener" doc:id="e209762a-c1f2-4903-98b6-435b7ab50158" config-ref="HTTP_Listener_config" path="/flow-referrence"/>
+		<file:read doc:name="Read" doc:id="8430af6b-e23f-4895-a442-1744f9b13c90" config-ref="File_Config" path="C:\Users\VISHAL\Downloads\sample.json" outputMimeType="application/json"/>
+		<set-variable value="#[payload.^mediaType]" doc:name="Set Variable" doc:id="879ca551-5dd1-40f5-b10a-d8a4040620ad" variableName="main-flow-variable"/>
+		<logger level="INFO" doc:name="Logger" doc:id="02fa54b1-f1f0-4894-bad3-0dc1bf204dde" message="This is the mime type : #[payload.^mediaType]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="f6294474-e915-4696-84e7-08b006e57212" name="child-flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="de4e2965-7d3a-475c-98e4-dc6b3263e068" message="#[payload.^mediaType]"/>
+	</flow>
+	<flow name="child-flow" doc:id="e2fb1215-4b42-4307-b8cb-babe706a731e" >
+		<ee:transform doc:name="Transform Message" doc:id="4509c54b-864d-4979-a7dc-8b6058ce038b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.^mediaType]" doc:name="Set Variable" doc:id="ba7a22ab-7e48-4995-9143-5abb50b2f5a9" variableName="child-flow-variable"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d70810bd-d420-4359-ba47-146e099743e1" message="#[payload.^mediaType]"/>
+	</flow>
+	<flow name="flow-referrence1-with-target-payload" doc:id="1f98bd1a-d874-4f3a-b299-7641e4626f7e" >
+		<http:listener doc:name="Listener" doc:id="b84b5012-fb7a-47c3-a5f4-d460e60d1105" config-ref="HTTP_Listener_config" path="/flow-referrence-withTarget" />
+		<file:read doc:name="Read" doc:id="dade109e-05ab-438d-a668-69ef9d33c43d" config-ref="File_Config" path="C:\Users\VISHAL\Downloads\sample.json" outputMimeType="application/json" />
+		<set-variable value="#[payload.^mediaType]" doc:name="Set Variable" doc:id="32192a56-fe0f-451b-9561-4a81cd3b937a" variableName="main-flow-variable" />
+		<logger level="INFO" doc:name="Logger" doc:id="8e858f62-23e8-4429-ac57-e41a56dacfa7" message="This is the mime type : #[payload.^mediaType]" />
+		<flow-ref doc:name="Flow Reference" doc:id="ea4483bb-e051-4ce0-aa1b-e61931010bfa" name="child-flow" target="payload"/>
+		<logger level="INFO" doc:name="Logger1" doc:id="e4e361f4-a4e1-484d-b983-e1ab37934174" message="#[payload.^mediaType]" />
+	</flow>
+</mule>
